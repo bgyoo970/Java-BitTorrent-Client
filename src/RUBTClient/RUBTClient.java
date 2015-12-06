@@ -4,9 +4,11 @@
  * Jarrett Mead (jfm168 | 143008288)
  * 
  * CS 352: Internet Technology
- * BitTorrent Client | Phase 1
+ * BitTorrent Client | Phase 3
  */
+
 package RUBTClient;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -79,7 +81,6 @@ public class RUBTClient {
 		
 		// Open connection, Send GET request to tracker
 		HttpURLConnection trackerConnection = torrent.getTrackerConnection(torrent);
-		DataInputStream dis = new DataInputStream(trackerConnection.getInputStream());
 		//trackerConnection.setRequestMethod("GET");
 		
 		// MULTITHREADING 
@@ -104,7 +105,7 @@ public class RUBTClient {
 		ThreadHandler.createIOStreams(threadList);
 		
 		// Start Threads
-		ThreadHandler.startThreads(threadList, torrent, ti, dl);								// Peer Threads
+		ThreadHandler.startThreads(threadList, torrent, ti, dl);							// Peer Threads
 		/*ListenThread lt = new ListenThread(torrent.getPort(), ti, torrent);				// Listen Thread
 		lt.start();
 		
@@ -137,7 +138,7 @@ public class RUBTClient {
 			
 			
 		}
-		else if(threadList.get(0).getBooleanFlag() == true){ //if q is HIT
+		else if(threadList.get(0).getQuitFlag() == true){ //if q is HIT
 		
 			Save s = new Save(dl.getIndexNoInc(), torrent.getDownloaded(),torrent.getMasterbuffer(), torrent.getInfoHash(), dl.getRemaining(), false);
 			try{
@@ -154,7 +155,7 @@ public class RUBTClient {
 				
 				
 			}
-		}else{//finished downloading
+		}else{		//finished downloading
 			
 			Save s = new Save(dl.getIndexNoInc(), torrent.getDownloaded(),torrent.getMasterbuffer(), torrent.getInfoHash(), dl.getRemaining(), true);
 			try{

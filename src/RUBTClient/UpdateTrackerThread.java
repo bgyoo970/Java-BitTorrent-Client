@@ -19,7 +19,7 @@ public class UpdateTrackerThread implements Runnable{
 	public UpdateTrackerThread(Torrent torrent) {
 		this.threadName = "update tracker thread";
 		this.torrent = torrent;
-		this.running = true;
+		UpdateTrackerThread.running = true;
 	}
 
 	    public static void terminate() {
@@ -33,13 +33,15 @@ public class UpdateTrackerThread implements Runnable{
 	        while (running) {
 	        	try {
 					Thread.sleep((long) 120000);
-					if(t.interrupted() == true){
+					if(Thread.interrupted() == true){
 						System.out.println("hi");
 					}
 					// Updates the tracker.
 					HttpURLConnection trackerConnection = torrent.getTrackerConnection(torrent);
 					DataInputStream dis = new DataInputStream(trackerConnection.getInputStream());
 					System.out.println("Successfully update the tracker");
+					
+					// DID WE ACTUALLY UPDATE THE TRACKER??? -JFM
 					
 				} catch (InterruptedException | IOException e) {
 					System.out.println("UpdateTrackerThread Error: " + e.getMessage());
@@ -58,6 +60,6 @@ public class UpdateTrackerThread implements Runnable{
 	}
 	
 	
-	public Thread getThread() {return this.t;}
+	public Thread getThread() {return UpdateTrackerThread.t;}
 
 }

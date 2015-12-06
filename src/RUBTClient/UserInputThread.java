@@ -10,7 +10,7 @@ public class UserInputThread implements Runnable{
 	private Thread t;
 	private ArrayList<DataInputStream> inputList;
 	private ArrayList<DataOutputStream> outputList;
-	private Download dl;
+	//private Download dl;
 	private ArrayList<PeerThread> threadList;
 	private ListenThread lt;
 	private Torrent torrent;
@@ -19,7 +19,7 @@ public class UserInputThread implements Runnable{
 		sc = new Scanner(System.in);
 		inputList = new ArrayList<DataInputStream>();
 		outputList = new ArrayList<DataOutputStream>();
-		this.dl = dl;
+		//this.dl = dl;
 		this.threadList = threadList;
 		this.lt = lt;
 		this.torrent = torrent;
@@ -78,7 +78,7 @@ public class UserInputThread implements Runnable{
 	
 	public void triggerFlag(){
 		try{//System.out.println("hello????");
-		threadList.get(0).setBooleanFlagToTrue();
+		threadList.get(0).setQuitFlagToTrue();
 		}
 		catch(IndexOutOfBoundsException e){
 			

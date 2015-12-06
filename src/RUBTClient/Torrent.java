@@ -6,6 +6,7 @@
  * CS 352: Internet Technology
  * BitTorrent Client | Phase 1
  */
+
 package RUBTClient;
 import java.io.BufferedInputStream;
 
@@ -157,12 +158,12 @@ public class Torrent {
 			System.out.println("Unable to create URL. Null received.");
 		
 		String announce_url = torrent.announce_url;
-		String parsedURL = parseAnnounceURL(announce_url);
-		String[] split = parsedURL.split(":");
+		//String parsedURL = parseAnnounceURL(announce_url);
+		//String[] split = parsedURL.split(":");
 		String info_hash = toHexString(torrent.info_hash);
 		String peer_id = this.peer_id;
 		String port = Integer.toString(this.port);
-		String ip = split[0];
+		//String ip = split[0];
 		String uploaded = Integer.toString(torrent.uploaded);
 		String downloaded = Integer.toString(torrent.downloaded);
 		String left = Integer.toString(torrent.file_length - torrent.downloaded);
@@ -199,12 +200,12 @@ public class Torrent {
 			System.out.println("Unable to obtain Torrent file metadata. Null received.");
 		
 		String announce_url = ti.announce_url.toString();
-		String parsedURL = parseAnnounceURL(announce_url);
-		String[] split = parsedURL.split(":");
+		//String parsedURL = parseAnnounceURL(announce_url);
+		//String[] split = parsedURL.split(":");
 		String info_hash = toHexString(ti.info_hash.array());
 		String peer_id = this.peer_id;
 		String port = Integer.toString(this.port);
-		String ip = split[0];
+		//String ip = split[0];
 		String uploaded = "0";
 		String downloaded = Integer.toString(downloaded_amt);
 		String left = Integer.toString(ti.file_length - downloaded_amt);
@@ -230,7 +231,6 @@ public class Torrent {
 	
 	public static String generatePeerID() {
 		char[] chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
-		int len = chars.length;
 		String peerid = "";
 		
 		// Peer ID must be length 20. Generate a random Peer ID that does not start with RUBT.
