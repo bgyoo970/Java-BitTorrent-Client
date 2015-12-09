@@ -104,7 +104,7 @@ public class Message {
 				continue;
 			}
 			
-			while(true) {		// In case an invalid packet is received and we must try to download the same piece again.
+			while(!thread.getQuitFlag()) {		// In case an invalid packet is received and we must try to download the same piece again.
 				// Check if the piece is the last packet (i.e. with a lesser piece length)
 				// Accommodate this disparity with the byte[] you read into.
 
@@ -139,7 +139,7 @@ public class Message {
 					output.write(generate_message(4, index, -1, -1, null));							// Send HAVE message to Peer.
 					
 				} else {
-					System.out.println("Invalid packet received. index = " + index);
+					//System.out.println("Invalid packet received. index = " + index);
 					continue;				// Try to download the same block again.
 				}
 				

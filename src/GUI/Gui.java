@@ -129,7 +129,7 @@ public class Gui {
 	      //headerLabel.setText("Bittorent"); 
 		  
 	      JButton startButton = new JButton("Start");        
-	      JButton quitButton = new JButton("Quit");
+	      JButton quitButton = new JButton("Stop Download");
 	      
 	      startButton.addActionListener(new ActionListener() {
 	         public void actionPerformed(ActionEvent e) {
@@ -144,8 +144,7 @@ public class Gui {
 	      quitButton.addActionListener(new ActionListener() {
 	         public void actionPerformed(ActionEvent e) {
 	            statusLabel.setText("Quitting...");
-	            System.out.println(quitFlag);
-	    	    
+	            
 	            setQuitFlag(true);
 	            System.out.println(quitFlag);
 	    
@@ -189,7 +188,7 @@ public class Gui {
 		   
 	   }
 	   public static void updateProgressBar(int progress) {		
-		   if(progress == 99){
+		   if(progress >= 99){
 		   			
 		   			statusLabel.setText("Download Complete");
 		 		   editorPane4.setText("Remaining Bytes : " + 0);

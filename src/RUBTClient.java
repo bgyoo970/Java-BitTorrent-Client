@@ -195,8 +195,7 @@ public class RUBTClient {
 			for (int i = 0; i < dl.getIndexNoInc(); i++){
 				fos.write(lastarr[i]);			
 			}
-			
-			
+			System.exit(0);
 		}
 		else if(threadList.get(0).getQuitFlag() == true){ //if q is HIT
 			System.out.println("QUIT@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -212,9 +211,8 @@ public class RUBTClient {
 			
 			for (int i = 0; i < dl.getIndexNoInc(); i++){
 				fos.write(lastarr[i]);
-				
-				
 			}
+			System.exit(0);
 		}else{		//finished downloading
 			
 			Save s = new Save(dl.getIndexNoInc(), torrent.getDownloaded(),torrent.getMasterbuffer(), torrent.getInfoHash(), dl.getRemaining(), true);
@@ -233,7 +231,6 @@ public class RUBTClient {
 					fos.write(lastarr[i]);
 				}
 			}
-			
 		}
 		fos.close();
 		

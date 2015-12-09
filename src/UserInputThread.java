@@ -28,34 +28,11 @@ public class UserInputThread implements Runnable{
 	public void run() {
 		String quitString1 = new String("q");
 		String quitString2 = new String("Q");
-
+		System.out.println("User inputthreadQDFSFSDSFS " + Message.guiThread.getGui().getQuitFlag());
+		
 		while(true){
-			System.out.println("HELLO  " +Message.guiThread.getGui().getQuitFlag());
-			//if(!sc.hasNext() || Message.guiThread.getGui().getQuitFlag() == true)
-				//continue;
-			
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			
-			String nextString = sc.next();
-			
 			if(Message.guiThread.getGui().getQuitFlag() == true){
-				nextString = "q";
-			}
-			System.out.println("User ssssinputthreadQDFSFSDSFS " + Message.guiThread.getGui().getQuitFlag());
-			if(Message.guiThread.getGui().getQuitFlag() == true || nextString.equals(quitString1) || nextString.equals(quitString2)){
 			//	System.out.println(dl.getIndexNoInc()); //save this index
-				System.out.println("User ssssinputthreadQDFSFSDSFS QUITTTT" + Message.guiThread.getGui().getQuitFlag());
 				System.out.println("Quit Success!");
 				triggerFlag();
 				UpdateTrackerThread.terminate();
@@ -72,7 +49,7 @@ public class UserInputThread implements Runnable{
 				}
 				
 				torrent.setEvent("stopped");
-				//break;
+				break;
 				
 			//	System.exit(0);
 			}
@@ -109,5 +86,8 @@ public class UserInputThread implements Runnable{
 	
 	public void closeSockets(){
 		
+	}
+	public Scanner getScanner() {
+		return this.sc;
 	}
 }
