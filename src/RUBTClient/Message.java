@@ -90,9 +90,10 @@ public class Message {
 		while ( thread.getDownload().getRemaining() > 0 && thread.getQuitFlag() == false ) {
 			System.out.println("Remaining: " + thread.getDownload().getRemaining());
 			index = thread.rarestPiece();
-			if(index == -1) {		// No more pieces.
+			if(index == -1) {		// No more pieces for this peer to download.
 				break;
 			} else if(torrent.getMasterbuffer()[index] != null) {	// Already downloaded this piece.
+				System.out.println("THIS SHOULD NOT EVER PRINT! Thread " + thread.getThreadName() + ": Piece " + (index+1) + " has already been downloaded. Selecting new piece.");
 				continue;
 			}
 			while(true) {		// In case an invalid packet is received and we must try to download the same piece again.

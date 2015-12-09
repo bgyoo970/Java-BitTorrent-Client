@@ -18,6 +18,7 @@ public class PeerThread implements Runnable{
 	private String threadName;
 	private Thread t;
 	private Download dl;
+	private BitSet peer_bitmap;
 	private static boolean quit_flag;
 	private static HashMap<Integer, ArrayList<Integer>> piece_rarity;
 	private static int numPeers;
@@ -50,11 +51,12 @@ public class PeerThread implements Runnable{
 				byte[] bitfield_message = Peer.getBitfield(socket, hashesLength);
 				if(bitfield_message == null){
 					System.out.println("Peer has no pieces.");
-				} else {
-					System.out.println("Received bitmap.");
+					t.interrupt();
 				}
-				BitSet peer_bitmap = byteArrayToBitSet(bitfield_message);
-				System.out.println("Peer " + threadName + " has pieces " + peer_bitmap.toString());
+				
+				System.out.println("Received bitmap.");
+				setPeerBitmap(byteArrayToBitSet(bitfield_message));
+				System.out.println("Peer " + threadName + " has pieces " + getPeerBitmap().toString());
 				
 				/*
 				 * Need to check for remaining messages in DataInputStream???
@@ -64,7 +66,7 @@ public class PeerThread implements Runnable{
 				 */
 				
 				// For each piece the peer has, update the static array
-				for(int i = peer_bitmap.nextSetBit(0); i >= 0; i = peer_bitmap.nextSetBit(i+1)) {
+				for(int i = getPeerBitmap().nextSetBit(0); i >= 0; i = peer_bitmap.nextSetBit(i+1)) {
 					foundPiece(i /*-3051*/);
 				}
 				
@@ -158,6 +160,10 @@ public class PeerThread implements Runnable{
 		}
 		
 		for(int j = 0; j <= PeerThread.piece_frequency.length-1; j++) {
+			if(dl.getTorrent().getMasterbuffer()[j] != null){
+				System.out.println("Piece " + (j+1) + " has already been downloaded. Adding next piece to the HashMap.");
+				continue;
+			}
 			PeerThread.piece_rarity.get(PeerThread.piece_frequency[j]).add(j);
 		}
 	}
@@ -172,22 +178,52 @@ public class PeerThread implements Runnable{
 	 */
 	public synchronized int rarestPiece() {
 		int index = -1;
-		int i;
+		int i, tmp;
 		
 		for(i = 1; i <= PeerThread.numPeers; i++) {
 			if(PeerThread.piece_rarity.get(i).size() == 1) {	// Rarest piece
-				index = PeerThread.piece_rarity.get(i).get(0);
-				break;
+				tmp = PeerThread.piece_rarity.get(i).get(0);
+				if(this.peer_bitmap.get(tmp)){
+					index = tmp;
+					break;
+				}
 			} else if(PeerThread.piece_rarity.get(i).size() > 1) {	// More than one, pick a random
-				int rand = ThreadLocalRandom.current().nextInt(0, PeerThread.piece_rarity.get(i).size());
-				index = PeerThread.piece_rarity.get(i).get(rand);
-				break;
+				tmp = checkPeerForThisRarity(PeerThread.piece_rarity.get(i));
+				
+				if(tmp != -1){
+					index = tmp;
+					break;
+				}
 			}
 		}
 		if(index != -1)
 			PeerThread.piece_rarity.get(i).remove((Integer) index);
 		
 		return index;
+	}
+	
+	public synchronized int checkPeerForThisRarity(ArrayList<Integer> rarity) {
+		int rand;
+		Object temp[] = rarity.toArray();
+		ArrayList<Integer> photocopy = new ArrayList<Integer>();
+		boolean found = false;
+		
+		for(int i = 0; i < temp.length; i++){
+			photocopy.add((Integer) temp[i]);
+		}
+
+		rand = ThreadLocalRandom.current().nextInt(0, photocopy.size());
+		found = this.peer_bitmap.get(rand);
+		while (!found && photocopy.size() > 0) {
+			photocopy.remove(rand);
+			rand = ThreadLocalRandom.current().nextInt(0, photocopy.size());
+			found = this.peer_bitmap.get(rand);
+		}
+		
+		if(!found)
+			return -1;
+		else
+			return photocopy.get(rand);
 	}
 	
 	public synchronized void initializePieceFreq() {
@@ -207,12 +243,14 @@ public class PeerThread implements Runnable{
 	public boolean getQuitFlag() {return PeerThread.quit_flag;}
 	public synchronized int getNumPeers() {return PeerThread.numPeers;}
 	public synchronized int getFinishedBitfield() {return PeerThread.finished_bitfield;}
+	public BitSet getPeerBitmap() {return this.peer_bitmap;}
 	
 	// Set Methods
 	public void setSocket(Socket s) {this.socket = s;}
 	public void setDataInputStream(DataInputStream dis) {this.input = dis;}
 	public void setDataOutputStream(DataOutputStream dos) {this.output = dos;}
 	public void setQuitFlagToTrue() {PeerThread.quit_flag = true;}
+	public void setPeerBitmap(BitSet bitmap) {this.peer_bitmap = bitmap;}
 	public synchronized void decNumPeers() {PeerThread.numPeers--;}
 	public synchronized void incNumPeers() {PeerThread.numPeers++;}
 	public synchronized void foundPiece(int pieceNum) {

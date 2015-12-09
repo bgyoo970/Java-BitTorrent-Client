@@ -77,15 +77,18 @@ public class Peer {
 		// Search through the list of peers and extract peers located at: 128.6.171.130, 128.6.171.131
 		ArrayList<HashMap<ByteBuffer, Object>> targetPeerList = new ArrayList<HashMap<ByteBuffer, Object>>();
 		ArrayList<Object> peerList = (ArrayList<Object>) decoded_response.get(PEERS);
+		System.out.println(peerList.size() + " peers total.");
 		for(int i = 0; i < peerList.size(); i++)
 		{
 			HashMap<ByteBuffer, Object> eachPeer = (HashMap<ByteBuffer, Object>) peerList.get(i);
 			// Extract the target peer(s) located at IP Addresses: 128.6.171.130 and 128.6.171.131
 			String currPeerIP = objectBBToString(eachPeer.get(IP));
 			if (currPeerIP.equals("128.6.171.130") || currPeerIP.equals("128.6.171.131")) {
+			//if (currPeerIP.equals("128.6.171.131")) {
 				targetPeerList.add(eachPeer);
 			}
 		}
+		System.out.println(targetPeerList.size() + " peers in targetPeerList.");
 		return targetPeerList;
 	}
 	
@@ -98,11 +101,13 @@ public class Peer {
 		port = (int) peer.get(PORT);
 		
 		try {
+			System.out.println("Attempting connection to peer...");
 			Socket s = new Socket(peerIP, port);
 			System.out.println("Successful connection to peer: " + peerIP);
 			return s;
 		} catch (IOException e) {
-			System.out.println("Unable to create a connection to the peer");
+			System.out.println("Unable to create a connection to peer: " + peerIP);
+			System.out.println(e.getMessage());
 		}
 		return null;
 	}
@@ -171,6 +176,7 @@ public class Peer {
 		
 		// HANDSHAKE
 		output.write(handshake);										// Send out HandShake to peer
+		RUBTClient.printByteArray(handshake);
 		byte[] HS_Response = new byte[68];
 		try {
 			input.readFully(HS_Response);									// Read in peer's response. Takes in response.
@@ -182,6 +188,8 @@ public class Peer {
 		//Check info_hash and peer_id of response
 		byte[] response_hash = null;
 		response_hash = java.util.Arrays.copyOfRange(HS_Response, 28, 48);		//copy info_hash section of handshake response into its own byte array
+		RUBTClient.printByteArray(response_hash);
+		RUBTClient.printByteArray(ti.info_hash.array());
 		
 		//If info_hash is not the one client is currently serving, sever the connection.
 		if(!java.util.Arrays.equals(ti.info_hash.array(), response_hash)){
@@ -192,6 +200,35 @@ public class Peer {
 		}
 		return true;
 	}
+
+	public static byte[] getBitfield(DataInputStream input, int hashesLength) throws IOException {
+		if(input == null){
+			System.out.println("ERRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+		}
+		
+		byte[] bitfield = null;
+		byte msgID;
+
+		try {
+			System.out.println(input.readByte());
+			System.out.println(input.readByte());
+			System.out.println(input.readByte());
+			System.out.println(input.readByte());
+			msgID = input.readByte();
+			System.out.println(msgID);
+			if(msgID == ((byte) Message.BITFIELD)){
+				// Get Bitfield
+				bitfield = new byte[hashesLength];
+				System.out.println(input.read(bitfield, 0, 55));
+			} else {
+				System.out.println("ERROR: LOST A PEER MESSAGE");
+			}
+		} catch (IOException e){
+			System.out.println("Unable to read bitfield response.");
+		}
+		
+		return bitfield;
+	}
 	
 	public static byte[] getBitfield(Socket s, int hashesLength) throws IOException {
 		byte[] bitfield = null;
@@ -201,8 +238,12 @@ public class Peer {
 		DataInputStream input = new DataInputStream(s.getInputStream());
 
 		try {
-			input.readInt();
+			System.out.println(input.readByte());
+			System.out.println(input.readByte());
+			System.out.println(input.readByte());
+			System.out.println(input.readByte());
 			msgID = input.readByte();
+			System.out.println(msgID);
 			if(msgID == ((byte) Message.BITFIELD)){
 				// Get Bitfield
 				bitfield = new byte[hashesLength];

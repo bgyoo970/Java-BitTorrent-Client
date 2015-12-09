@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,6 +82,7 @@ public class RUBTClient {
 		
 		// Open connection, Send GET request to tracker
 		HttpURLConnection trackerConnection = torrent.getTrackerConnection(torrent);
+		DataInputStream dis = new DataInputStream(trackerConnection.getInputStream());
 		//trackerConnection.setRequestMethod("GET");
 		
 		// MULTITHREADING 
@@ -91,14 +93,22 @@ public class RUBTClient {
 		 */
 		ArrayList<PeerThread> threadList = new ArrayList<PeerThread>();
 		ArrayList<HashMap<ByteBuffer, Object>> peerList = Peer.getTargetPeerList(trackerConnection);
-		for(int i = 0; i < peerList.size(); i++)
+		int pi = 0;
+		int pj = 0;
+		while( pi < peerList.size())
 		{
-			HashMap<ByteBuffer, Object> eachPeer = (HashMap<ByteBuffer, Object>) peerList.get(i);
+			HashMap<ByteBuffer, Object> eachPeer = (HashMap<ByteBuffer, Object>) peerList.get(pi);
 			String currPeerID = Peer.objectBBToString(eachPeer.get(Peer.PEER_ID));
 			
 			PeerThread t = new PeerThread(currPeerID, dl);
-			threadList.add(t);
-			threadList.get(i).setSocket(Peer.openTCPConnection(eachPeer));
+			Socket tmpSock;
+			if((tmpSock = Peer.openTCPConnection(eachPeer)) != null){
+				threadList.add(t);
+				threadList.get(pj).setSocket(tmpSock);
+				System.out.println("Added " + threadList.get(threadList.indexOf(t)).getThreadName() + " to the threadlist.");
+				pj++;
+			}
+			pi++;
 		}
 		
 		// Create IO streams.
